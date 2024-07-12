@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 @Configuration
@@ -16,13 +18,17 @@ public class EmailConfig {
     }
 
     @Bean
-    JavaMailSenderImpl getMailSender() {
+    JavaMailSenderImpl getMailSender() throws IOException {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 
-        javaMailSender.setHost("smtp.gmail.com");
-        javaMailSender.setPort(587);
-        javaMailSender.setUsername("notificationtest87@gmail.com");
-        javaMailSender.setPassword("dtcl djlo ksat ulih");
+        Properties prop = new Properties();
+        InputStream inputStream = getClass().getResourceAsStream("notification.config");
+        prop.load(inputStream);
+
+        javaMailSender.setHost(prop.getProperty("notification.email.host"));
+        javaMailSender.setPort(Integer.parseInt(prop.getProperty("notification.email.port")));
+        javaMailSender.setUsername(prop.getProperty("notification.email.username"));
+        javaMailSender.setPassword(prop.getProperty("notification.email.password"));
 
         Properties properties = javaMailSender.getJavaMailProperties();
         properties.put("mail.debug", true);
